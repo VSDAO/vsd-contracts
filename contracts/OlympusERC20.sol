@@ -122,7 +122,7 @@ library EnumerableSet {
     bytes32 existingValue_ = _at( set_, index_ );
     set_._values[index_] = valueToInsert_;
     return _add( set_, existingValue_);
-  } 
+  }
 
   struct Bytes4Set {
     Set _inner;
@@ -603,7 +603,7 @@ abstract contract ERC20 is IERC20 {
 
   // TODO comment actual hash value.
   bytes32 constant private ERC20TOKEN_ERC1820_INTERFACE_ID = keccak256( "ERC20Token" );
-    
+
   // Present in ERC777
   mapping (address => uint256) internal _balances;
 
@@ -615,10 +615,10 @@ abstract contract ERC20 is IERC20 {
 
   // Present in ERC777
   string internal _name;
-    
+
   // Present in ERC777
   string internal _symbol;
-    
+
   // Present in ERC777
   uint8 internal _decimals;
 
@@ -812,12 +812,12 @@ interface IOwnable {
   function owner() external view returns (address);
 
   function renounceOwnership() external;
-  
+
   function transferOwnership( address newOwner_ ) external;
 }
 
 contract Ownable is IOwnable {
-    
+
   address internal _owner;
 
   event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
@@ -849,7 +849,7 @@ contract Ownable is IOwnable {
 }
 
 contract VaultOwned is Ownable {
-    
+
   address internal _vault;
 
   function setVault( address vault_ ) external onlyOwner() returns ( bool ) {
@@ -869,11 +869,258 @@ contract VaultOwned is Ownable {
 
 }
 
+// pragma solidity >=0.5.0;
+
+interface IUniswapV2Factory {
+    event PairCreated(address indexed token0, address indexed token1, address pair, uint);
+
+    function feeTo() external view returns (address);
+    function feeToSetter() external view returns (address);
+
+    function getPair(address tokenA, address tokenB) external view returns (address pair);
+    function allPairs(uint) external view returns (address pair);
+    function allPairsLength() external view returns (uint);
+
+    function createPair(address tokenA, address tokenB) external returns (address pair);
+
+    function setFeeTo(address) external;
+    function setFeeToSetter(address) external;
+}
+
+
+// pragma solidity >=0.5.0;
+
+interface IUniswapV2Pair {
+    event Approval(address indexed owner, address indexed spender, uint value);
+    event Transfer(address indexed from, address indexed to, uint value);
+
+    function name() external pure returns (string memory);
+    function symbol() external pure returns (string memory);
+    function decimals() external pure returns (uint8);
+    function totalSupply() external view returns (uint);
+    function balanceOf(address owner) external view returns (uint);
+    function allowance(address owner, address spender) external view returns (uint);
+
+    function approve(address spender, uint value) external returns (bool);
+    function transfer(address to, uint value) external returns (bool);
+    function transferFrom(address from, address to, uint value) external returns (bool);
+
+    function DOMAIN_SEPARATOR() external view returns (bytes32);
+    function PERMIT_TYPEHASH() external pure returns (bytes32);
+    function nonces(address owner) external view returns (uint);
+
+    function permit(address owner, address spender, uint value, uint deadline, uint8 v, bytes32 r, bytes32 s) external;
+
+    event Mint(address indexed sender, uint amount0, uint amount1);
+    event Burn(address indexed sender, uint amount0, uint amount1, address indexed to);
+    event Swap(
+        address indexed sender,
+        uint amount0In,
+        uint amount1In,
+        uint amount0Out,
+        uint amount1Out,
+        address indexed to
+    );
+    event Sync(uint112 reserve0, uint112 reserve1);
+
+    function MINIMUM_LIQUIDITY() external pure returns (uint);
+    function factory() external view returns (address);
+    function token0() external view returns (address);
+    function token1() external view returns (address);
+    function getReserves() external view returns (uint112 reserve0, uint112 reserve1, uint32 blockTimestampLast);
+    function price0CumulativeLast() external view returns (uint);
+    function price1CumulativeLast() external view returns (uint);
+    function kLast() external view returns (uint);
+
+    function mint(address to) external returns (uint liquidity);
+    function burn(address to) external returns (uint amount0, uint amount1);
+    function swap(uint amount0Out, uint amount1Out, address to, bytes calldata data) external;
+    function skim(address to) external;
+    function sync() external;
+
+    function initialize(address, address) external;
+}
+
+// pragma solidity >=0.6.2;
+
+interface IUniswapV2Router01 {
+    function factory() external pure returns (address);
+    function WETH() external pure returns (address);
+
+    function addLiquidity(
+        address tokenA,
+        address tokenB,
+        uint amountADesired,
+        uint amountBDesired,
+        uint amountAMin,
+        uint amountBMin,
+        address to,
+        uint deadline
+    ) external returns (uint amountA, uint amountB, uint liquidity);
+    function addLiquidityETH(
+        address token,
+        uint amountTokenDesired,
+        uint amountTokenMin,
+        uint amountETHMin,
+        address to,
+        uint deadline
+    ) external payable returns (uint amountToken, uint amountETH, uint liquidity);
+    function removeLiquidity(
+        address tokenA,
+        address tokenB,
+        uint liquidity,
+        uint amountAMin,
+        uint amountBMin,
+        address to,
+        uint deadline
+    ) external returns (uint amountA, uint amountB);
+    function removeLiquidityETH(
+        address token,
+        uint liquidity,
+        uint amountTokenMin,
+        uint amountETHMin,
+        address to,
+        uint deadline
+    ) external returns (uint amountToken, uint amountETH);
+    function removeLiquidityWithPermit(
+        address tokenA,
+        address tokenB,
+        uint liquidity,
+        uint amountAMin,
+        uint amountBMin,
+        address to,
+        uint deadline,
+        bool approveMax, uint8 v, bytes32 r, bytes32 s
+    ) external returns (uint amountA, uint amountB);
+    function removeLiquidityETHWithPermit(
+        address token,
+        uint liquidity,
+        uint amountTokenMin,
+        uint amountETHMin,
+        address to,
+        uint deadline,
+        bool approveMax, uint8 v, bytes32 r, bytes32 s
+    ) external returns (uint amountToken, uint amountETH);
+    function swapExactTokensForTokens(
+        uint amountIn,
+        uint amountOutMin,
+        address[] calldata path,
+        address to,
+        uint deadline
+    ) external returns (uint[] memory amounts);
+    function swapTokensForExactTokens(
+        uint amountOut,
+        uint amountInMax,
+        address[] calldata path,
+        address to,
+        uint deadline
+    ) external returns (uint[] memory amounts);
+    function swapExactETHForTokens(uint amountOutMin, address[] calldata path, address to, uint deadline)
+    external
+    payable
+    returns (uint[] memory amounts);
+    function swapTokensForExactETH(uint amountOut, uint amountInMax, address[] calldata path, address to, uint deadline)
+    external
+    returns (uint[] memory amounts);
+    function swapExactTokensForETH(uint amountIn, uint amountOutMin, address[] calldata path, address to, uint deadline)
+    external
+    returns (uint[] memory amounts);
+    function swapETHForExactTokens(uint amountOut, address[] calldata path, address to, uint deadline)
+    external
+    payable
+    returns (uint[] memory amounts);
+
+    function quote(uint amountA, uint reserveA, uint reserveB) external pure returns (uint amountB);
+    function getAmountOut(uint amountIn, uint reserveIn, uint reserveOut) external pure returns (uint amountOut);
+    function getAmountIn(uint amountOut, uint reserveIn, uint reserveOut) external pure returns (uint amountIn);
+    function getAmountsOut(uint amountIn, address[] calldata path) external view returns (uint[] memory amounts);
+    function getAmountsIn(uint amountOut, address[] calldata path) external view returns (uint[] memory amounts);
+}
+
+
+
+// pragma solidity >=0.6.2;
+
+interface IUniswapV2Router02 is IUniswapV2Router01 {
+    function removeLiquidityETHSupportingFeeOnTransferTokens(
+        address token,
+        uint liquidity,
+        uint amountTokenMin,
+        uint amountETHMin,
+        address to,
+        uint deadline
+    ) external returns (uint amountETH);
+    function removeLiquidityETHWithPermitSupportingFeeOnTransferTokens(
+        address token,
+        uint liquidity,
+        uint amountTokenMin,
+        uint amountETHMin,
+        address to,
+        uint deadline,
+        bool approveMax, uint8 v, bytes32 r, bytes32 s
+    ) external returns (uint amountETH);
+
+    function swapExactTokensForTokensSupportingFeeOnTransferTokens(
+        uint amountIn,
+        uint amountOutMin,
+        address[] calldata path,
+        address to,
+        uint deadline
+    ) external;
+    function swapExactETHForTokensSupportingFeeOnTransferTokens(
+        uint amountOutMin,
+        address[] calldata path,
+        address to,
+        uint deadline
+    ) external payable;
+    function swapExactTokensForETHSupportingFeeOnTransferTokens(
+        uint amountIn,
+        uint amountOutMin,
+        address[] calldata path,
+        address to,
+        uint deadline
+    ) external;
+}
+
+interface IVaultTmp {
+    function withdraw(address token) external;
+}
+
 contract OlympusERC20Token is ERC20Permit, VaultOwned {
 
     using SafeMath for uint256;
 
-    constructor() ERC20("Olympus", "OHM", 9) {
+    uint256 private _liquidityFee = 0.08 ether;
+    uint256 private _numTokensSellToAddToLiquidity = 5000 * 10**9;
+    bool inSwapAndLiquify;
+    bool private _swapAndLiquifyEnabled = true;
+    mapping (address => bool) private _isExcludedFromFee;
+
+    address public _vaultTmpAddress;
+    address public immutable uniswapV2Pair;
+    IUniswapV2Router02 public immutable uniswapV2Router;
+    IERC20 public constant VVS_TOKEN = IERC20(0x2D03bECE6747ADC00E1a131BBA1469C15fD11e03);
+    address public constant BLACK_HOLE = address(0x000000000000000000000000000000000000dEaD);
+
+    event SwapAndLiquify(
+        uint256 tokensSwapped,
+        uint256 ethReceived,
+        uint256 tokensIntoLiqudity
+    );
+
+    modifier lockTheSwap {
+        inSwapAndLiquify = true;
+        _;
+        inSwapAndLiquify = false;
+    }
+
+    constructor() ERC20("Very Simple DAO", "VSD", 9) {
+        IUniswapV2Router02 _uniswapV2Router = IUniswapV2Router02(0xcd7d16fB918511BF7269eC4f48d61D79Fb26f918);
+        uniswapV2Pair = IUniswapV2Factory(_uniswapV2Router.factory()).createPair(address(this), address(VVS_TOKEN));
+        uniswapV2Router = _uniswapV2Router;
+
+        _isExcludedFromFee[msg.sender] = true;
+        _isExcludedFromFee[address(this)] = true;
     }
 
     function mint(address account_, uint256 amount_) external onlyVault() {
@@ -883,7 +1130,7 @@ contract OlympusERC20Token is ERC20Permit, VaultOwned {
     function burn(uint256 amount) public virtual {
         _burn(msg.sender, amount);
     }
-     
+
     function burnFrom(address account_, uint256 amount_) public virtual {
         _burnFrom(account_, amount_);
     }
@@ -897,5 +1144,146 @@ contract OlympusERC20Token is ERC20Permit, VaultOwned {
 
         _approve(account_, msg.sender, decreasedAllowance_);
         _burn(account_, amount_);
+    }
+
+    function getVaultTmpAddress() public view returns (address) {
+        return _vaultTmpAddress;
+    }
+
+    function getLiquidityFee() public view returns (uint256) {
+        return _liquidityFee;
+    }
+
+    function isExcludedFromFee(address account) public view returns (bool) {
+        return _isExcludedFromFee[account];
+    }
+
+    function getNumTokensSellToAddToLiquidity() public view returns (uint256) {
+        return _numTokensSellToAddToLiquidity;
+    }
+
+    function isSwapAndLiquifyEnabled() public view returns (bool) {
+        return _swapAndLiquifyEnabled;
+    }
+
+    function setVaultTmpAddress(address vaultTmpAddress) public onlyOwner() {
+        _vaultTmpAddress = vaultTmpAddress;
+    }
+
+    function setLiquidityFee(uint256 liquidityFee) public onlyOwner() {
+        _liquidityFee = liquidityFee;
+    }
+
+    function excludeFromFee(address account) public onlyOwner() {
+        _isExcludedFromFee[account] = true;
+    }
+
+    function includeInFee(address account) public onlyOwner() {
+        _isExcludedFromFee[account] = false;
+    }
+
+    function setNumTokensSellToAddToLiquidity(uint256 numTokensSellToAddToLiquidity) public onlyOwner() {
+        _numTokensSellToAddToLiquidity = numTokensSellToAddToLiquidity;
+    }
+
+    function enabledSwapAndLiquify() public onlyOwner() {
+        _swapAndLiquifyEnabled = true;
+    }
+
+    function disableSwapAndLiquify() public onlyOwner() {
+        _swapAndLiquifyEnabled = false;
+    }
+
+    function _transfer(address sender, address recipient, uint256 amount) internal virtual override {
+        require(sender != address(0), "ERC20: transfer from the zero address");
+        require(recipient != address(0), "ERC20: transfer to the zero address");
+
+        uint256 contractTokenBalance = balanceOf(address(this));
+        bool overMinTokenBalance = contractTokenBalance >= _numTokensSellToAddToLiquidity;
+        if (
+            overMinTokenBalance &&
+            ! inSwapAndLiquify &&
+            sender != uniswapV2Pair &&
+            _swapAndLiquifyEnabled
+        ) {
+            contractTokenBalance = _numTokensSellToAddToLiquidity;
+            // add liquidity
+            swapAndLiquify(contractTokenBalance);
+        }
+
+        uint256 recipientAmount = amount;
+        if (!isExcludedFromFee(sender) && !isExcludedFromFee(recipient)) {
+            uint256 liquidityFee = amount.mul(_liquidityFee).div(1 ether);
+            _balances[address(this)] = _balances[address(this)].add(liquidityFee);
+
+            recipientAmount = amount.sub(liquidityFee);
+        }
+
+        _beforeTokenTransfer(sender, recipient, amount);
+
+        _balances[sender] = _balances[sender].sub(amount, "ERC20: transfer amount exceeds balance");
+        _balances[recipient] = _balances[recipient].add(recipientAmount);
+        emit Transfer(sender, recipient, amount);
+    }
+
+    function swapAndLiquify(uint256 contractTokenBalance) private lockTheSwap {
+        // split the contract balance into halves
+        uint256 half = contractTokenBalance.div(2);
+        uint256 otherHalf = contractTokenBalance.sub(half);
+
+        // capture the contract's current ETH balance.
+        // this is so that we can capture exactly the amount of ETH that the
+        // swap creates, and not make the liquidity event include any ETH that
+        // has been manually sent to the contract
+        uint256 initialBalance = VVS_TOKEN.balanceOf(address(this));
+
+        // swap tokens for ETH
+        swapTokensForEth(half); // <- this breaks the ETH -> HATE swap when swap+liquify is triggered
+
+        // how much ETH did we just swap into?
+        uint256 newBalance = VVS_TOKEN.balanceOf(address(this)).sub(initialBalance);
+
+        // add liquidity to uniswap
+        addLiquidity(otherHalf, newBalance);
+
+        emit SwapAndLiquify(half, newBalance, otherHalf);
+    }
+
+    function swapTokensForEth(uint256 tokenAmount) private {
+        // generate the uniswap pair path of token -> weth
+        address[] memory path = new address[](2);
+        path[0] = address(this);
+        path[1] = address(VVS_TOKEN);
+
+        _approve(address(this), address(uniswapV2Router), tokenAmount);
+
+        // make the swap
+        uniswapV2Router.swapExactTokensForTokensSupportingFeeOnTransferTokens(
+            tokenAmount,
+            0, // accept any amount of ETH
+            path,
+            _vaultTmpAddress,
+            block.timestamp + 60
+        );
+
+        IVaultTmp(_vaultTmpAddress).withdraw(path[1]);
+    }
+
+    function addLiquidity(uint256 tokenAmount, uint256 ethAmount) private {
+        // approve token transfer to cover all possible scenarios
+        _approve(address(this), address(uniswapV2Router), tokenAmount);
+        VVS_TOKEN.approve(address(uniswapV2Router), ethAmount);
+
+        // add the liquidity
+        uniswapV2Router.addLiquidity(
+            address(this),
+            address(VVS_TOKEN),
+            tokenAmount,
+            ethAmount,
+            0, // slippage is unavoidable
+            0, // slippage is unavoidable
+            BLACK_HOLE,
+            block.timestamp + 60
+        );
     }
 }

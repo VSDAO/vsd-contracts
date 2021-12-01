@@ -507,7 +507,7 @@ interface IERC20 {
 }
 
 abstract contract ERC20
-  is 
+  is
     IERC20
   {
 
@@ -515,7 +515,7 @@ abstract contract ERC20
 
   // TODO comment actual hash value.
   bytes32 constant private ERC20TOKEN_ERC1820_INTERFACE_ID = keccak256( "ERC20Token" );
-    
+
   // Present in ERC777
   mapping (address => uint256) internal _balances;
 
@@ -527,10 +527,10 @@ abstract contract ERC20
 
   // Present in ERC777
   string internal _name;
-    
+
   // Present in ERC777
   string internal _symbol;
-    
+
   // Present in ERC777
   uint8 internal _decimals;
 
@@ -609,7 +609,7 @@ abstract contract ERC20
    * - the caller must have a balance of at least `amount`.
    */
   // Overrideen in ERC777
-  // Confirm that this behavior changes 
+  // Confirm that this behavior changes
   function transfer(address recipient, uint256 amount) public virtual override returns (bool) {
     _transfer(msg.sender, recipient, amount);
     return true;
@@ -941,9 +941,9 @@ interface IOwnable {
   function manager() external view returns (address);
 
   function renounceManagement() external;
-  
+
   function pushManagement( address newOwner_ ) external;
-  
+
   function pullManagement() external;
 }
 
@@ -979,7 +979,7 @@ contract Ownable is IOwnable {
         emit OwnershipPushed( _owner, newOwner_ );
         _newOwner = newOwner_;
     }
-    
+
     function pullManagement() public virtual override {
         require( msg.sender == _newOwner, "Ownable: must be new owner to pull");
         emit OwnershipPulled( _owner, _newOwner );
@@ -1031,7 +1031,7 @@ contract sOlympus is ERC20Permit, Ownable {
 
     mapping ( address => mapping ( address => uint256 ) ) private _allowedValue;
 
-    constructor() ERC20("Staked Olympus", "sOHM", 9) ERC20Permit() {
+    constructor() ERC20("Staked Very Simple DAO", "sVSD", 9) ERC20Permit() {
         initializer = msg.sender;
         _totalSupply = INITIAL_FRAGMENTS_SUPPLY;
         _gonsPerFragment = TOTAL_GONS.div(_totalSupply);
@@ -1045,7 +1045,7 @@ contract sOlympus is ERC20Permit, Ownable {
 
         emit Transfer( address(0x0), stakingContract, _totalSupply );
         emit LogStakingContractUpdated( stakingContract_ );
-        
+
         initializer = address(0);
         return true;
     }
@@ -1107,7 +1107,7 @@ contract sOlympus is ERC20Permit, Ownable {
             index: index(),
             blockNumberOccured: block.number
         }));
-        
+
         emit LogSupply( epoch_, block.timestamp, _totalSupply );
         emit LogRebase( epoch_, rebasePercent, index() );
 
