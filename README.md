@@ -1,4 +1,4 @@
-# Ω Olympus Smart Contracts
+# Ω Very Simple DAO Smart Contracts
 
 
 ##  🔧 Setting up Local Development
